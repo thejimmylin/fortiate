@@ -4,7 +4,7 @@
 ## What does fortiate do?
  It turns config like this
  
- config firewall policy
+ config firewall policy. 
     edit 168
         set name "policy168"
         set uuid 14435052-3097-4d70-98c7-1dd2d60e229f

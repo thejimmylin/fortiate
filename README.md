@@ -4,13 +4,13 @@
 ## What does fortiate do?
  It turns config like this
  ```
- config firewall policy
+config firewall policy
     edit 168
         set name "policy168"
         set uuid 14435052-3097-4d70-98c7-1dd2d60e229f
         set srcintf "jimmylin__1688"
         set dstintf "port1"
-        set srcaddr "address__jimmylin_10.100.168.11/32"
+        set srcaddr "address__jimmylin__10.100.168.11/32"
         set dstaddr "all"
         set action accept
         set schedule "always"
@@ -18,7 +18,7 @@
         set comments "\"customer\": \"Jimmy Lin\""
         set nat enable
         set ippool enable
-        set poolname "ippool_jimmylin_168.100.168.11"
+        set poolname "ippool__jimmylin__168.100.168.11"
     next
 end
 ```
@@ -34,10 +34,10 @@ to this
             "set ippool": "enable",
             "set name": "policy168",
             "set nat": "enable",
-            "set poolname": "ippool_jimmylin_168.100.168.11",
+            "set poolname": "ippool__jimmylin__168.100.168.11",
             "set schedule": "always",
             "set service": "ALL",
-            "set srcaddr": "address__jimmylin_10.100.168.11/32",
+            "set srcaddr": "address__jimmylin__10.100.168.11/32",
             "set srcintf": "jimmylin__1688",
             "set uuid": "14435052-3097-4d70-98c7-1dd2d60e229f"
         },
@@ -71,10 +71,10 @@ You should see something like this.
             "set ippool": "enable",
             "set name": "policy168",
             "set nat": "enable",
-            "set poolname": "ippool_jimmylin_168.100.168.11",
+            "set poolname": "ippool__jimmylin__168.100.168.11",
             "set schedule": "always",
             "set service": "ALL",
-            "set srcaddr": "address__jimmylin_10.100.168.11/32",
+            "set srcaddr": "address__jimmylin__10.100.168.11/32",
             "set srcintf": "jimmylin__1688",
             "set uuid": "14435052-3097-4d70-98c7-1dd2d60e229f"
         },
@@ -97,7 +97,7 @@ You should see something like this.
             "set dstintf": "jimmylin__1688",
             "set name": "policy170",
             "set schedule": "always",
-            "set service": "service__tcp__8080_8080 a service name with spaces",
+            "set service": "service__tcp__8080__8080 a service name with spaces",
             "set srcaddr": "all",
             "set srcintf": "port1",
             "set uuid": "2d05b2f4-9968-43c0-8bfa-581e04144466"

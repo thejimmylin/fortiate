@@ -46,7 +46,7 @@ to this
 ```
 You can edit data on this dictionary-like object and turn it back.
 
-## Installation & Run examples
+## Installation & Run samples
 ```
 cd /your/repos/path
 mkdir fortiate
@@ -55,5 +55,5 @@ python3 -m venv venv
 source ./venv/bin/activate
 git clone https://github.com/j3ygithub/fortiate
 cd fortigate
-python parser.py
+python samples.py
 ```

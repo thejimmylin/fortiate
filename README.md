@@ -3,8 +3,8 @@
 
 ## What does fortiate do?
  It turns config like this
- 
- config firewall policy. 
+ ```
+ config firewall policy
     edit 168
         set name "policy168"
         set uuid 14435052-3097-4d70-98c7-1dd2d60e229f
@@ -21,9 +21,9 @@
         set poolname "ippool_jimmylin_168.100.168.11"
     next
 end
-
+```
 to this
-
+```
 {
     "config firewall policy": {
         "edit 168": {
@@ -43,11 +43,11 @@ to this
         },
     }
 }
-
+```
 You can edit data on this dictionary-like object and turn it back.
 
 ## Installation & Run examples
-
+```
 cd /your/repos/path
 mkdir fortiate
 cd fortiate
@@ -56,3 +56,4 @@ source ./venv/bin/activate
 git clone https://github.com/j3ygithub/fortiate
 cd fortigate
 python parser.py
+```

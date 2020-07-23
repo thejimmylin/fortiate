@@ -1,6 +1,6 @@
 import os
 import json
-from fortiate.parsers import Parser
+from ..fortiate.parsers import Parser
 
 
 BASE_DIR = os.path.dirname(__file__)

@@ -61,6 +61,12 @@ class IndentShellLine():
         self.lf = self.text[-1] if self.text.endswith(self.lfs) else ''
         self.formatted = self.get_formatted()
 
+    def __repr__(self):
+        return self.text
+
+    def __str__(self):
+        return self.text
+
     def get_indent(self):
         indent = (
             len(self.text) - len(self.text.lstrip(self.space))
@@ -72,4 +78,4 @@ class IndentShellLine():
         return formatted
 
     def rebuild(self):
-        self.text = self.indent + ' '.join(self.formatted)
+        self.text = self.indent + ' '.join(self.formatted) + self.lf

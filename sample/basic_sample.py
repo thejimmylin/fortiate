@@ -1,6 +1,12 @@
+import sys
 import os
 import json
-from ..fortiate.parsers import Parser
+fortiate_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'fortiate'
+)  # In case fortiate is not installed as a package.
+sys.path.insert(0, fortiate_path)
+from parsers import Parser  # noqa
 
 
 BASE_DIR = os.path.dirname(__file__)

@@ -4,11 +4,19 @@ import shlex
 class Parser():
 
     def get_leading_spaces(self, string, space=' '):
-        leading_spaces_count = len(string) - len(string.lstrip(space))
-        return space * leading_spaces_count
+        leading_space = (
+            len(string) - len(string.lstrip(space))
+        ) * space
+        return leading_space
 
     def get_formatted_lines(self, lines):
-        return [[self.get_leading_spaces(string=line)] + shlex.split(line) for line in lines]
+        formatted_lines = [
+            [
+                self.get_leading_spaces(string=line)
+            ] + shlex.split(line)
+            for line in lines
+        ]
+        return formatted_lines
 
     def get_formatted_dct(self, formatted_lines):
         current_config = ''

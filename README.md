@@ -55,7 +55,8 @@ python3 -m venv venv
 source ./venv/bin/activate
 git clone https://github.com/j3ygithub/fortiate
 cd fortigate
-python samples.py
+cd samples
+python basic_sample.py
 ```
 
 You should see something like this.

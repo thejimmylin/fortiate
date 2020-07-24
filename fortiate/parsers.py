@@ -50,32 +50,32 @@ class Parser():
 
 class IndentShellLine():
 
-    def __init__(self, text, space='', lfs=()):
-        self.text = text
+    def __init__(self, raw, space='', lfs=()):
+        self.raw = raw
         self.space = space or ' '
         self.lfs = lfs or ('\n', )
         for lf in self.lfs:
-            if lf in self.text[:-1]:
+            if lf in self.raw[:-1]:
                 raise ValueError('A line feed exists in the line.')
         self.indent = self.get_indent()
-        self.lf = self.text[-1] if self.text.endswith(self.lfs) else ''
+        self.lf = self.raw[-1] if self.raw.endswith(self.lfs) else ''
         self.formatted = self.get_formatted()
 
-    def __repr__(self):
-        return self.text
-
     def __str__(self):
-        return self.text
+        return self.raw
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: {self}>'
 
     def get_indent(self):
         indent = (
-            len(self.text) - len(self.text.lstrip(self.space))
+            len(self.raw) - len(self.raw.lstrip(self.space))
         ) * self.space
         return indent
 
     def get_formatted(self):
-        formatted = shlex.split(self.text, posix=False)
+        formatted = shlex.split(self.raw, posix=False)
         return formatted
 
     def rebuild(self):
-        self.text = self.indent + ' '.join(self.formatted) + self.lf
+        self.raw = self.indent + ' '.join(self.formatted) + self.lf

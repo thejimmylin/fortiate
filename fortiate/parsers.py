@@ -50,14 +50,15 @@ class Parser():
 
 class IndentShellLine():
 
-    def __init__(self, text, space=' ', line_feed_list=['\n', ]):
-        self.space = space
-        self.line_feed_list = line_feed_list
-        for line_feed in self.line_feed_list:
-            if line_feed in text[:-1]:
-                raise Exception('A line feed exists in the line.')
+    def __init__(self, text, space='', lfs=()):
         self.text = text
+        self.space = space or ' '
+        self.lfs = lfs or ('\n', )
+        for lf in self.lfs:
+            if lf in self.text[:-1]:
+                raise ValueError('A line feed exists in the line.')
         self.indent = self.get_indent()
+        self.lf = self.text[-1] if self.text.endswith(self.lfs) else ''
         self.formatted = self.get_formatted()
 
     def get_indent(self):

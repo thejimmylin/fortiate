@@ -1,3 +1,4 @@
+import string
 import shlex
 
 
@@ -49,6 +50,8 @@ class Parser():
 
 
 class IndentShellLine():
+
+    whitespace = ' \t\r\n'
 
     def __init__(self, raw, space='', lfs=()):
         self.raw = raw

@@ -4,10 +4,10 @@ import shlex
 class Parser():
 
     def get_leading_spaces(self, string, space=' '):
-        leading_space = (
+        leading_spaces = (
             len(string) - len(string.lstrip(space))
         ) * space
-        return leading_space
+        return leading_spaces
 
     def get_formatted_lines(self, lines):
         formatted_lines = [
@@ -46,3 +46,29 @@ class Parser():
 
     def get_reorganize_lines(self, formatted_lines):
         return [line[0] + shlex.join(line[1:]) for line in formatted_lines]
+
+
+class IndentShellLine():
+
+    def __init__(self, text, space=' ', line_feed_list=['\n', ]):
+        self.space = space
+        self.line_feed_list = line_feed_list
+        for line_feed in self.line_feed_list:
+            if line_feed in text[:-1]:
+                raise Exception('A line feed exists in the line.')
+        self.text = text
+        self.indent = self.get_indent()
+        self.formatted = self.get_formatted()
+
+    def get_indent(self):
+        indent = (
+            len(self.text) - len(self.text.lstrip(self.space))
+        ) * self.space
+        return indent
+
+    def get_formatted(self):
+        formatted = shlex.split(self.text, posix=False)
+        return formatted
+
+    def rebuild(self):
+        self.text = self.indent + ' '.join(self.formatted)

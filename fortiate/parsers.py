@@ -1,19 +1,32 @@
-import string
-import shlex
+from shlex import shlex
+
+
+def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
+    """
+    Re-define the split function in shlex to make it possible to
+    specify custom whitespace characters when we call this function.
+    When not provided, it act like the original one.
+    """
+    lex = shlex(s, posix=posix)
+    lex.whitespace = whitespace
+    lex.whitespace_split = True
+    if not comments:
+        lex.commenters = ''
+    return list(lex)
 
 
 class Parser():
 
-    def get_leading_spaces(self, string, space=' '):
+    def get_leading_spaces(self, s, space=' '):
         leading_spaces = (
-            len(string) - len(string.lstrip(space))
+            len(s) - len(s.lstrip(space))
         ) * space
         return leading_spaces
 
     def get_formatted_lines(self, lines):
         formatted_lines = [
             [
-                self.get_leading_spaces(string=line)
+                self.get_leading_spaces(s=line)
             ] + shlex.split(line)
             for line in lines
         ]
@@ -52,6 +65,7 @@ class Parser():
 class IndentShellLine():
 
     whitespace = ' \t\r\n'
+    linebreak = '\n'
 
     def __init__(self, raw, space='', lfs=()):
         self.raw = raw
@@ -77,7 +91,7 @@ class IndentShellLine():
         return indent
 
     def get_formatted(self):
-        formatted = shlex.split(self.raw, posix=False)
+        formatted = shlex_split(self.raw, posix=False, whitespace=self.whitespace)
         return formatted
 
     def rebuild(self):

@@ -1,3 +1,4 @@
+import re
 from shlex import shlex
 
 
@@ -63,12 +64,17 @@ class Parser():
 
 
 class IndentShellLine():
+    """
+    A single line should not include any line feed, or in fact it's two lines.
+    """
 
-    whitespace = ' \t\r\n'
-    linebreak = '\n'
+    whitespace = ' '
+    line_feed_chars = ['\r', '\n', ]
 
     def __init__(self, raw, space='', lfs=()):
         self.raw = raw
+        self.leading_whitespace = self.raw[:-len(self.raw.lstrip(self.whitespace))]
+        self.trailing_whitespace = self.raw[len(self.raw.rstrip(self.whitespace)):]
         self.space = space or ' '
         self.lfs = lfs or ('\n', )
         for lf in self.lfs:

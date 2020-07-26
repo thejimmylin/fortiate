@@ -61,7 +61,6 @@ python basic_sample.py
 
 You should see something like this.
 ```
------- start ------
 {
     "config firewall policy": {
         "edit 168": {
@@ -105,7 +104,6 @@ You should see something like this.
         }
     }
 }
------- end ------
 ```
 
 See smaples.py for more detail.

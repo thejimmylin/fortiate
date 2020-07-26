@@ -2,20 +2,6 @@ import re
 from shlex import shlex
 
 
-def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
-    """
-    Re-define the split function in shlex to make it possible to
-    specify custom whitespace characters when we call this function.
-    When not provided, it act like the original one.
-    """
-    lex = shlex(s, posix=posix)
-    lex.whitespace = whitespace
-    lex.whitespace_split = True
-    if not comments:
-        lex.commenters = ''
-    return list(lex)
-
-
 class Parser():
 
     def get_leading_spaces(self, s, space=' '):
@@ -63,26 +49,44 @@ class Parser():
         return [line[0] + shlex.join(line[1:]) for line in formatted_lines]
 
 
-class IndentShellLine():
+def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
     """
-    A single line should not include any line feed, or in fact it's two lines.
+    Re-define the split function in shlex to make it possible to
+    specify custom whitespace characters when we call this function.
+    When not provided, it act like the original one.
+    """
+    lex = shlex(s, posix=posix)
+    lex.whitespace = whitespace
+    lex.whitespace_split = True
+    if not comments:
+        lex.commenters = ''
+    return list(lex)
+
+
+class IndentShellCommand():
+    """
+    A class describing a single line shell-like command with indentations,
+    generating formatted data with module shlex and preserve the indentation
+    part of it.
     """
 
-    whitespace = ' '
-    line_feed_chars = ['\r', '\n', ]
-
-    def __init__(self, raw, space='', lfs=()):
-        self.raw = raw
-        self.leading_whitespace = self.raw[:-len(self.raw.lstrip(self.whitespace))]
-        self.trailing_whitespace = self.raw[len(self.raw.rstrip(self.whitespace)):]
-        self.space = space or ' '
-        self.lfs = lfs or ('\n', )
-        for lf in self.lfs:
-            if lf in self.raw[:-1]:
-                raise ValueError('A line feed exists in the line.')
-        self.indent = self.get_indent()
-        self.lf = self.raw[-1] if self.raw.endswith(self.lfs) else ''
-        self.formatted = self.get_formatted()
+    def __init__(self, raw, indentation_char=' ', whitespace=' '):
+        self._raw = raw
+        self._indentation_char = indentation_char
+        self._whitespace = whitespace
+        self._indentation = self.raw[
+            :-len(self.raw.lstrip(self._indentation_char))
+        ]
+        self._command = self.raw.lstrip(self._indentation_char)
+        self._split_command = shlex_split(
+            self._command, posix=False, whitespace=self._whitespace
+        )
+        if not self.is_consistent():
+            print(
+                'Warning: The raw command and its concatenation of '
+                'indentation and split command are not consistent. Maybe '
+                'there are trailing spaces?'
+            )
 
     def __str__(self):
         return self.raw
@@ -90,15 +94,46 @@ class IndentShellLine():
     def __repr__(self):
         return f'<{self.__class__.__name__}: {self}>'
 
-    def get_indent(self):
-        indent = (
-            len(self.raw) - len(self.raw.lstrip(self.space))
-        ) * self.space
-        return indent
+    @property
+    def raw(self):
+        return self._raw
 
-    def get_formatted(self):
-        formatted = shlex_split(self.raw, posix=False, whitespace=self.whitespace)
-        return formatted
+    @property
+    def indentation_char(self):
+        return self._indentation_char
 
-    def rebuild(self):
-        self.raw = self.indent + ' '.join(self.formatted) + self.lf
+    @property
+    def whitespace(self):
+        return self._whitespace
+
+    @property
+    def indentation(self):
+        return self._indentation
+
+    @property
+    def command(self):
+        return self._command
+
+    @property
+    def split_command(self):
+        return self._split_command
+
+    @property
+    def cleaned(self):
+        if hasattr(self, '_cleaned'):
+            return self._cleaned
+        else:
+            print(
+                'Warning: The raw command and its concatenation of '
+                'indentation and split command are not consistent. Maybe '
+                'there are trailing spaces?'
+            )
+
+    def is_consistent(self):
+        concatenation = self._indentation + self._whitespace.join(self._split_command)
+        if concatenation == self._raw:
+            self._cleaned = self._raw
+            return True
+        else:
+            self._cleaned = None
+            return False

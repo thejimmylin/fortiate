@@ -63,21 +63,21 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
     return list(lex)
 
 
-class IndentShellCommand():
+class IndentedShellCommand():
     """
     A class describing a single line shell-like command with indentations,
     generating formatted data with module shlex and preserve the indentation
     part of it.
     """
 
-    def __init__(self, raw, indentation_char=' ', whitespace=' '):
+    def __init__(self, raw, indented_with=' ', whitespace=' '):
         self._raw = raw
-        self._indentation_char = indentation_char
+        self._indented_with = indented_with
         self._whitespace = whitespace
         self._indentation = self.raw[
-            :-len(self.raw.lstrip(self._indentation_char))
+            :-len(self.raw.lstrip(self._indented_with))
         ]
-        self._command = self.raw.lstrip(self._indentation_char)
+        self._command = self.raw.lstrip(self._indented_with)
         self._split_command = shlex_split(
             self._command, posix=False, whitespace=self._whitespace
         )
@@ -85,7 +85,7 @@ class IndentShellCommand():
             print(
                 'Warning: The raw command and its concatenation of '
                 'indentation and split command are not consistent. Maybe '
-                'there are trailing spaces?'
+                'there are consecutive/trailing spaces?'
             )
 
     def __str__(self):
@@ -99,8 +99,8 @@ class IndentShellCommand():
         return self._raw
 
     @property
-    def indentation_char(self):
-        return self._indentation_char
+    def indented_with(self):
+        return self._indented_with
 
     @property
     def whitespace(self):
@@ -126,7 +126,7 @@ class IndentShellCommand():
             print(
                 'Warning: The raw command and its concatenation of '
                 'indentation and split command are not consistent. Maybe '
-                'there are trailing spaces?'
+                'there are consecutive/trailing spaces?'
             )
 
     def is_consistent(self):
@@ -135,5 +135,4 @@ class IndentShellCommand():
             self._cleaned = self._raw
             return True
         else:
-            self._cleaned = None
             return False

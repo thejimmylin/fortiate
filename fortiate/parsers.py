@@ -132,7 +132,21 @@ class IndentedShellCommand():
         return self.indentation + joined_command == self._raw
 
 
-class IndentedFortiCommand(IndentedShellCommand):
+class FortiCommand(IndentedShellCommand):
 
-    def __init__(self, lines):
-        super().__init__()
+    command_structures = [
+        {'prefix': 'config', 'args': 2},
+        {'prefix': 'end', 'args': 0},
+        {'prefix': 'edit', 'args': 1},
+        {'prefix': 'next', 'args': 0},
+        {'prefix': 'set', 'args': 2},
+        {'prefix': 'set', 'args': 3},
+        {'prefix': 'set', 'args': 4},
+    ]
+
+    def __init__(self, raw, indented_with=' ', whitespace=' '):
+        super().__init__(raw=raw, indented_with=indented_with, whitespace=whitespace)
+
+    @property
+    def prefix(self):
+        return self.split_command[0]

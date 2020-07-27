@@ -132,25 +132,48 @@ class IndentedShellCommand():
         return self.indentation + joined_command == self._raw
 
 
-class FortiCommand(IndentedShellCommand):
+class FortiConfig():
 
-    command_structures = [
-        {'prefix': 'config', 'args': 2},
-        {'prefix': 'end', 'args': 0},
-        {'prefix': 'edit', 'args': 1},
-        {'prefix': 'next', 'args': 0},
-        {'prefix': 'set', 'args': 2},
-        {'prefix': 'set', 'args': 3},
-        {'prefix': 'set', 'args': 4},
-    ]
-
-    def __init__(self, raw, indented_with=' ', whitespace=' '):
-        super().__init__(raw=raw, indented_with=indented_with, whitespace=whitespace)
+    def __init__(self, lines=None, file=None):
+        if lines is not None:
+            self.init_with_lines(lines)
+        elif file is not None:
+            self.init_with_file(file)
+        else:
+            raise ValueError('No commands or file provided, initialization failed.')
 
     @property
-    def prefix(self):
-        return self.split_command[0]
+    def commands(self):
+        return self._commands
 
-    def parse(self):
-        if self.prefix not in ['config', 'end', 'edit', 'next', 'set']:
-            raise ValueError('Invalid prefix.')
+    def init_with_lines(self, lines):
+        current_config = ''
+        current_edit = ''
+        formatted_dct = {}
+        for index, line in enumerate(lines):
+            isc = IndentedShellCommand(raw=line)
+            if len(isc.split_command) < 1:
+                raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
+            (*values, ) = isc.split_command
+            prefix = values[0]
+            if prefix not in ['config', 'end', 'edit', 'next', 'set']:
+                raise ValueError(f'A line with unknown prefix exsits in config file, index = {index}, line = {line}.')
+            if prefix == 'config':
+                current_config = ' '.join(values)
+                formatted_dct[current_config] = {}
+                continue
+            if prefix == 'edit':
+                current_edit = ' '.join(values)
+                formatted_dct[current_config][current_edit] = {}
+                continue
+            if prefix in ['next', 'end']:
+                continue
+            # Here, it should be true that prefix == 'set'
+            current_set = ' '.join(values[0:2])
+            formatted_dct[current_config][current_edit][current_set] = ' '.join(values[2:])
+        self.formatted_dct = formatted_dct
+
+    def init_with_file(self, file):
+        with open(file=file, mode='r', encoding='utf-8') as f:
+            lines = f.read().splitlines()
+            self.init_with_lines(lines)

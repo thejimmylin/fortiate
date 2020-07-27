@@ -135,9 +135,9 @@ class IndentedShellCommand():
 class FortiConfig():
 
     def __init__(self, lines=[], file=''):
-        if lines is not None:
+        if lines:
             self.init_with_lines(lines)
-        elif file is not None:
+        elif file:
             self.init_with_file(file)
         else:
             raise ValueError('No commands/file provided, initialization failed.')
@@ -150,28 +150,28 @@ class FortiConfig():
         current_config = ''
         current_edit = ''
         current_set = ''
-        formatted_dct = {}
+        context = {}
         for index, line in enumerate(lines):
             command = IndentedShellCommand(raw=line)
-            prefix, *args = command.split_command
-            if prefix == 'set':
-                current_set = ' '.join(args[:2])
-                formatted_dct[current_config][current_edit][current_set] = ' '.join(args[2:])
+            if command.split_command[0] == 'set':
+                k, value = command.split_command[:2], command.split_command[2:]
+                current_set = ' '.join(k)
+                context[current_config][current_edit][current_set] = ' '.join(value)
                 continue
-            if prefix == 'edit':
-                current_edit = ' '.join(args)
-                formatted_dct[current_config][current_edit] = {}
+            if command.split_command[0] == 'edit':
+                current_edit = ' '.join(command.split_command)
+                context[current_config][current_edit] = {}
                 continue
-            if prefix == 'config':
-                current_config = ' '.join(args)
-                formatted_dct[current_config] = {}
+            if command.split_command[0] == 'config':
+                current_config = ' '.join(command.split_command)
+                context[current_config] = {}
                 continue
-            if prefix in ['next', 'end']:
+            if command.split_command[0] in ['next', 'end']:
                 continue
             raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
-            self.formatted_dct = formatted_dct
+        self.context = context
 
     def init_with_file(self, file):
         with open(file=file, mode='r', encoding='utf-8') as f:
             lines = f.read().splitlines()
-            self.init_with_lines(lines)
+        self.init_with_lines(lines)

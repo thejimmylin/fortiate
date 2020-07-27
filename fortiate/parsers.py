@@ -130,3 +130,9 @@ class IndentedShellCommand():
     def is_consistent(self):
         joined_command = self._whitespace.join(self.split_command)
         return self.indentation + joined_command == self._raw
+
+
+class IndentedFortiCommand(IndentedShellCommand):
+
+    def __init__(self, lines):
+        super().__init__()

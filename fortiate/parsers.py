@@ -64,8 +64,8 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
 
 class IndentedShellCommand():
     """
-    A class describing a single line shell-like command with indentations,
-    generating formatted data with module shlex and preserve the indentation
+    A class describing a single line shell-like command with indentation,
+    generating formatted data using module shlex and preserve the indentation
     part of it.
     """
 
@@ -73,18 +73,11 @@ class IndentedShellCommand():
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace
-        self._indentation = self.raw[
-            :-len(self.raw.lstrip(self._indented_with))
-        ]
-        self._command = self.raw.lstrip(self._indented_with)
-        self._split_command = shlex_split(
-            self._command, posix=False, whitespace=self._whitespace
-        )
         if not self.is_consistent():
             print(
                 'Warning: The raw command and its concatenation of '
                 'indentation and split command are not consistent. Maybe '
-                'there are consecutive/trailing spaces?'
+                'there are consecutive/trailing white spaces?'
             )
 
     def __str__(self):
@@ -107,31 +100,33 @@ class IndentedShellCommand():
 
     @property
     def indentation(self):
-        return self._indentation
+        return self._raw[:-len(self._raw.lstrip(self._indented_with))]
+
+    @indentation.setter
+    def indentation(self, value):
+        self._raw = value + self._raw.lstrip(self._indented_with)
 
     @property
     def command(self):
-        return self._command
+        return self._raw.lstrip(self._indented_with)
+
+    @command.setter
+    def command(self, value):
+        self._raw = (
+            self._raw[:-len(self._raw.lstrip(self._indented_with))] +
+            value
+        )
 
     @property
     def split_command(self):
-        return self._split_command
+        return shlex_split(
+            self.command, posix=False, whitespace=self._whitespace
+        )
 
-    @property
-    def cleaned(self):
-        if hasattr(self, '_cleaned'):
-            return self._cleaned
-        else:
-            print(
-                'Warning: The raw command and its concatenation of '
-                'indentation and split command are not consistent. Maybe '
-                'there are consecutive/trailing spaces?'
-            )
+    @split_command.setter
+    def split_command(self, value):
+        self.command = self._whitespace.join(value)
 
     def is_consistent(self):
-        concatenation = self._indentation + self._whitespace.join(self._split_command)
-        if concatenation == self._raw:
-            self._cleaned = self._raw
-            return True
-        else:
-            return False
+        joined_command = self._whitespace.join(self.split_command)
+        return self.indentation + joined_command == self._raw

@@ -134,13 +134,13 @@ class IndentedShellCommand():
 
 class FortiConfig():
 
-    def __init__(self, lines=None, file=None):
+    def __init__(self, lines=[], file=''):
         if lines is not None:
             self.init_with_lines(lines)
         elif file is not None:
             self.init_with_file(file)
         else:
-            raise ValueError('No commands or file provided, initialization failed.')
+            raise ValueError('No commands/file provided, initialization failed.')
 
     @property
     def commands(self):
@@ -149,29 +149,27 @@ class FortiConfig():
     def init_with_lines(self, lines):
         current_config = ''
         current_edit = ''
+        current_set = ''
         formatted_dct = {}
         for index, line in enumerate(lines):
-            isc = IndentedShellCommand(raw=line)
-            if len(isc.split_command) < 1:
-                raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
-            (*values, ) = isc.split_command
-            prefix = values[0]
-            if prefix not in ['config', 'end', 'edit', 'next', 'set']:
-                raise ValueError(f'A line with unknown prefix exsits in config file, index = {index}, line = {line}.')
-            if prefix == 'config':
-                current_config = ' '.join(values)
-                formatted_dct[current_config] = {}
+            command = IndentedShellCommand(raw=line)
+            prefix, *args = command.split_command
+            if prefix == 'set':
+                current_set = ' '.join(args[:2])
+                formatted_dct[current_config][current_edit][current_set] = ' '.join(args[2:])
                 continue
             if prefix == 'edit':
-                current_edit = ' '.join(values)
+                current_edit = ' '.join(args)
                 formatted_dct[current_config][current_edit] = {}
+                continue
+            if prefix == 'config':
+                current_config = ' '.join(args)
+                formatted_dct[current_config] = {}
                 continue
             if prefix in ['next', 'end']:
                 continue
-            # Here, it should be true that prefix == 'set'
-            current_set = ' '.join(values[0:2])
-            formatted_dct[current_config][current_edit][current_set] = ' '.join(values[2:])
-        self.formatted_dct = formatted_dct
+            raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
+            self.formatted_dct = formatted_dct
 
     def init_with_file(self, file):
         with open(file=file, mode='r', encoding='utf-8') as f:

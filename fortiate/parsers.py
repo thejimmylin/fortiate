@@ -150,3 +150,7 @@ class FortiCommand(IndentedShellCommand):
     @property
     def prefix(self):
         return self.split_command[0]
+
+    def parse(self):
+        if self.prefix not in ['config', 'end', 'edit', 'next', 'set']:
+            raise ValueError('Invalid prefix.')

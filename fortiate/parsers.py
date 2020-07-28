@@ -48,7 +48,7 @@ class Parser():
         return [line[0] + shlex.join(line[1:]) for line in formatted_lines]
 
 
-def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
+def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
     """
     Re-define the split function in shlex to make it possible to
     specify custom whitespace characters when we call this function.
@@ -56,7 +56,7 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n'):
     """
     lex = shlex(s, posix=posix)
     lex.whitespace = whitespace
-    lex.whitespace_split = True
+    lex.whitespace_split = whitespace_split
     if not comments:
         lex.commenters = ''
     return list(lex)

@@ -179,3 +179,15 @@ class FortiConfig():
 
 def print_self(stdout):
     print('print_self' + '(' + stdout.__repr__() + ')')
+
+
+class FortiStyleStr():
+
+    def __init__(self, raw):
+        self.raw = raw
+
+    def __repr__(self):
+        return self.__repr__()
+
+    def __str__(self):
+        return self.__str__()

@@ -175,3 +175,7 @@ class FortiConfig():
         with open(file=file, mode='r', encoding='utf-8') as f:
             lines = f.read().splitlines()
         self.init_with_lines(lines)
+
+
+def print_self(stdout):
+    print('print_self' + '(' + stdout.__repr__() + ')')

@@ -183,11 +183,11 @@ def print_self(stdout):
 
 class FortiStyleStr():
 
-    def __init__(self, raw):
-        self.raw = raw
+    def __init__(self, string):
+        self._string = string
 
     def __repr__(self):
-        return self.__repr__()
+        return f'<{self.__class__.__name__}: {self}>'
 
     def __str__(self):
-        return self.__str__()
+        return self._string

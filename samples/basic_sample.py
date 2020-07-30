@@ -9,7 +9,10 @@ fortiate_path = os.path.join(
     'fortiate'
 )
 sys.path.insert(1, fortiate_path)
-from parsers import shlex_join, IndentedShellCommand  # noqa
+"""
+The above sys things could be skipped if you add fortiate to the $PYTHONPATH.
+"""
+from commands import shlex_join, IndentedShellCommand  # noqa
 
 
 current_dir = os.path.dirname(__file__)

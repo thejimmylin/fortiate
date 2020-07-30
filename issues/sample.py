@@ -29,6 +29,14 @@ print(parse2(lines[2]))
 comment = 'This is better, but the quotes missed.'
 print('\n' + '-' * 80 + '\n' + comment + '\n' + '-' * 80 + '\n')
 
+print(shlex_join(parse2(lines[2])))
+comment = 'We can join it back together with shlex_join.'
+print('\n' + '-' * 80 + '\n' + comment + '\n' + '-' * 80 + '\n')
+
+print(shlex_join(parse2(lines[10])))
+comment = 'But if a word in the list does not contain space, the quotes around it go away.'
+print('\n' + '-' * 80 + '\n' + comment + '\n' + '-' * 80 + '\n')
+
 print(parse3(lines[10]))
 comment = 'This is great, but it does not work on lines[11]'
 print('\n' + '-' * 80 + '\n' + comment + '\n' + '-' * 80 + '\n')

@@ -1,4 +1,5 @@
 from shlex import shlex
+from shlex import quote
 
 
 class Parser():
@@ -50,8 +51,8 @@ class Parser():
 
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
     """
-    Re-define the split function in shlex to make it possible to
-    specify custom whitespace characters when we call this function.
+    Re-define the split function in shlex to make it possible to specify
+    custom whitespace and whitespace_split when we call this function.
     When not provided, it act like the original one.
     """
     lex = shlex(s, posix=posix)
@@ -60,6 +61,16 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_
     if not comments:
         lex.commenters = ''
     return list(lex)
+
+
+def shlex_join(split_command, whitespace=' '):
+    """
+    Re-define the join function in shlex to make it possible to specify
+    custom whitespace and whitespace_split when we call this function.
+    When not provided, it act like the original one.
+    """
+    """Return a shell-escaped string from *split_command*."""
+    return whitespace.join(quote(arg) for arg in split_command)
 
 
 class IndentedShellCommand():
@@ -125,10 +136,10 @@ class IndentedShellCommand():
 
     @split_command.setter
     def split_command(self, value):
-        self.command = self._whitespace.join(value)
+        self.command = shlex_join(value, whitespace=self._whitespace)
 
     def is_consistent(self):
-        joined_command = self._whitespace.join(self.split_command)
+        joined_command = shlex_join(self.split_command, whitespace=self._whitespace)
         return self.indentation + joined_command == self._raw
 
 
@@ -175,19 +186,3 @@ class FortiConfig():
         with open(file=file, mode='r', encoding='utf-8') as f:
             lines = f.read().splitlines()
         self.init_with_lines(lines)
-
-
-def print_self(stdout):
-    print('print_self' + '(' + stdout.__repr__() + ')')
-
-
-class FortiStyleStr():
-
-    def __init__(self, string):
-        self._string = string
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: {self}>'
-
-    def __str__(self):
-        return self._string

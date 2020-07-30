@@ -33,16 +33,18 @@ class IndentedShellCommand():
     part of it.
     """
 
+    warning = (
+        'Warning: The raw command and its concatenation of '
+        'indentation and split command are not consistent. Maybe '
+        'there are consecutive/trailing white spaces?'
+    )
+
     def __init__(self, raw, indented_with=' ', whitespace=' ', fail_silently=True):
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace
         if not self.is_consistent() and not fail_silently:
-            print(
-                'Warning: The raw command and its concatenation of '
-                'indentation and split command are not consistent. Maybe '
-                'there are consecutive/trailing white spaces?'
-            )
+            print(self.warning)
 
     def __str__(self):
         return self.raw

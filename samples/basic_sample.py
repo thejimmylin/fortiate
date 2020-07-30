@@ -22,7 +22,12 @@ with open(file=file, mode='r', encoding='utf-8') as f:
 
 for line in lines:
     isc = IndentedShellCommand(raw=line)
-    print(isc.split_command)
+    print(isc.raw)
 
 for line in lines:
-    print(isc.raw)
+    isc = IndentedShellCommand(raw=line)
+    print(isc.command)
+
+for line in lines:
+    isc = IndentedShellCommand(raw=line)
+    print(isc.split_command)

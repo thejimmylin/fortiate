@@ -2,53 +2,6 @@ from shlex import shlex
 from shlex import quote
 
 
-class Parser():
-
-    def get_leading_spaces(self, s, space=' '):
-        leading_spaces = (
-            len(s) - len(s.lstrip(space))
-        ) * space
-        return leading_spaces
-
-    def get_formatted_lines(self, lines):
-        formatted_lines = [
-            [
-                self.get_leading_spaces(s=line)
-            ] + shlex.split(line)
-            for line in lines
-        ]
-        return formatted_lines
-
-    def get_formatted_dct(self, formatted_lines):
-        current_config = ''
-        current_edit = ''
-        formatted_dct = {}
-        for index, line in enumerate(formatted_lines):
-            if len(line) < 2:
-                raise Exception(f'An invalid line exsits in config file, index = {index}, line = {line}.')
-            indent, *values = line
-            prefix = values[0]
-            if prefix not in ['config', 'end', 'edit', 'next', 'set']:
-                raise Exception(f'A line with unknown prefix exsits in config file, index = {index}, line = {line}.')
-            if prefix == 'config':
-                current_config = ' '.join(values)
-                formatted_dct[current_config] = {}
-                continue
-            if prefix == 'edit':
-                current_edit = ' '.join(values)
-                formatted_dct[current_config][current_edit] = {}
-                continue
-            if prefix in ['next', 'end']:
-                continue
-            # Here, it should be true that prefix == 'set'
-            current_set = ' '.join(values[0:2])
-            formatted_dct[current_config][current_edit][current_set] = ' '.join(values[2:])
-        return formatted_dct
-
-    def get_reorganize_lines(self, formatted_lines):
-        return [line[0] + shlex.join(line[1:]) for line in formatted_lines]
-
-
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
     """
     Re-define the split function in shlex to make it possible to specify
@@ -80,11 +33,11 @@ class IndentedShellCommand():
     part of it.
     """
 
-    def __init__(self, raw, indented_with=' ', whitespace=' '):
+    def __init__(self, raw, indented_with=' ', whitespace=' ', fail_silently=True):
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace
-        if not self.is_consistent():
+        if not self.is_consistent() and not fail_silently:
             print(
                 'Warning: The raw command and its concatenation of '
                 'indentation and split command are not consistent. Maybe '
@@ -131,7 +84,7 @@ class IndentedShellCommand():
     @property
     def split_command(self):
         return shlex_split(
-            self.command, posix=False, whitespace=self._whitespace
+            self.command, whitespace=self._whitespace
         )
 
     @split_command.setter

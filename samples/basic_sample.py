@@ -1,8 +1,9 @@
 import sys
 import os
 """
-In case fortiate is not installed as a package, we add it to sys.path manually here.
-If you install fortiate and added it to the $PYTHONPATH, this could be skipped.
+In case fortiate is not installed as a package and is added to the $PYTHONPATH
+we add it to sys.path manually here. If fortiate has been added to your
+$PYTHONPATH already, this could be skipped.
 """
 fortiate_path = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

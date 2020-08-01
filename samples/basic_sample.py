@@ -17,8 +17,8 @@ from commands import shlex_join, IndentedShellCommand  # noqa
 
 
 current_dir = os.path.dirname(__file__)
-file = os.path.join(current_dir, 'conf', 'firewall_policy.conf')
-with open(file=file, mode='r', encoding='utf-8') as f:
+conf_file = os.path.join(current_dir, 'conf', 'firewall_policy.conf')
+with open(file=conf_file, mode='r', encoding='utf-8') as f:
     lines = f.read().splitlines()
 
 for line in lines:

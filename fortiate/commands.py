@@ -39,7 +39,7 @@ class IndentedShellCommand():
         'there are consecutive/trailing white spaces?'
     )
 
-    def __init__(self, raw, indented_with=' ', whitespace=' ', fail_silently=True):
+    def __init__(self, raw='', indented_with=' ', whitespace=' ', fail_silently=True):
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace

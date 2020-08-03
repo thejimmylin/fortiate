@@ -5,8 +5,7 @@ from shlex import quote
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
     """
     Re-define the split function in shlex to make it possible to specify
-    custom whitespace and whitespace_split when we call this function.
-    When not provided, it act like the original one.
+    custom whitespace and whitespace_split when we call it.
     """
     lex = shlex(s, posix=posix)
     lex.whitespace = whitespace
@@ -18,11 +17,9 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_
 
 def shlex_join(split_command, whitespace=' '):
     """
-    Re-define the join function in shlex to make it possible to specify
-    custom whitespace and whitespace_split when we call this function.
-    When not provided, it act like the original one.
+    Re-define the join function in shlex to make it possible to specify custom
+    whitespace when we call it.
     """
-    """Return a shell-escaped string from *split_command*."""
     return whitespace.join(quote(arg) for arg in split_command)
 
 
@@ -32,7 +29,6 @@ class IndentedShellCommand():
     generating formatted data using module shlex and preserve the indentation
     part of it.
     """
-
     warning = (
         'Warning: The raw command and its concatenation of '
         'indentation and split command are not consistent. Maybe '
@@ -94,5 +90,7 @@ class IndentedShellCommand():
         self.command = shlex_join(value, whitespace=self._whitespace)
 
     def is_consistent(self):
-        joined_command = shlex_join(self.split_command, whitespace=self._whitespace)
+        joined_command = shlex_join(
+            self.split_command, whitespace=self._whitespace
+        )
         return self.indentation + joined_command == self._raw

@@ -2,7 +2,7 @@ from .commands import IndentedShellCommand
 import commands
 
 
-class FortiConfig():
+class IndentedShellConfig():
 
     def __init__(self, lines):
         self._init_with_lines(lines)
@@ -36,9 +36,9 @@ class FortiConfig():
 # pseudocode
 
 
-class FortiAddressConfig(FortiConfig):
+class FortiAddressConfig(IndentedShellConfig):
 
-    edit = commands.EditCommand()
-    address = commands.SetCommand()
-    subnet = commands.SetCommand()
-    comments = commands.SetCommand()
+    edit = commands.EditCommand(max_length=64)
+    address = commands.SetCommand(max_length=64)
+    subnet = commands.SetCommand(max_length=64)
+    comments = commands.SetCommand(max_length=64)

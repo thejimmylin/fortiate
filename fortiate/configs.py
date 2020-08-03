@@ -38,7 +38,6 @@ class IndentedShellConfig():
 
 class FortiAddressConfig(IndentedShellConfig):
 
-    edit = commands.EditCommand(max_length=64)
-    address = commands.SetCommand(max_length=64)
+    edit = commands.EditCommand(max_length=64, uniqe=True)
     subnet = commands.SetCommand(max_length=64)
-    comments = commands.SetCommand(max_length=64)
+    comments = commands.SetCommand(max_length=64, blank=True)

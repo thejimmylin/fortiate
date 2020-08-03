@@ -1,4 +1,5 @@
 from .commands import IndentedShellCommand
+import commands
 
 
 class FortiConfig():
@@ -30,3 +31,14 @@ class FortiConfig():
                 continue
             raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
         self.context = context
+
+
+# pseudocode
+
+
+class FortiAddressConfig(FortiConfig):
+
+    edit = commands.EditCommand()
+    address = commands.SetCommand()
+    subnet = commands.SetCommand()
+    comments = commands.SetCommand()

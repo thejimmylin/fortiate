@@ -3,19 +3,10 @@ from .commands import IndentedShellCommand
 
 class FortiConfig():
 
-    def __init__(self, lines=[], file=''):
-        if lines:
-            self.init_with_lines(lines)
-        elif file:
-            self.init_with_file(file)
-        else:
-            raise ValueError('No commands/file provided, initialization failed.')
+    def __init__(self, lines):
+        self._init_with_lines(lines)
 
-    @property
-    def commands(self):
-        return self._commands
-
-    def init_with_lines(self, lines):
+    def _init_with_lines(self, lines):
         config_key = ''
         edit_key = ''
         set_key = ''
@@ -39,8 +30,3 @@ class FortiConfig():
                 continue
             raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
         self.context = context
-
-    def init_with_file(self, file):
-        with open(file=file, mode='r', encoding='utf-8') as f:
-            lines = f.read().splitlines()
-        self.init_with_lines(lines)

@@ -43,8 +43,7 @@ class IndentedShellCommand():
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace
-        if not self.is_consistent() and not fail_silently:
-            print(self._warning_of_inconsistency)
+        self.is_consistent() and fail_silently or print(self._warning_of_inconsistency)
 
     def __str__(self):
         return self.raw

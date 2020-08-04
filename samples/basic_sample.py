@@ -28,21 +28,21 @@ print('\n')
 print('------example1------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(raw=line)
+    isc = IndentedShellCommand(line)
     print(isc.raw)
 
 print('\n')
 print('------example2------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(raw=line)
+    isc = IndentedShellCommand(line)
     print(isc.command)
 
 print('\n')
 print('------example3------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(raw=line)
+    isc = IndentedShellCommand(line)
     print(isc.split_command)
 
 print('\n')
@@ -50,7 +50,7 @@ print('------example4------')
 print('\n')
 configs = {}
 for index, line in enumerate(lines):
-    isc = IndentedShellCommand(raw=line)
+    isc = IndentedShellCommand(line)
     if isc.split_command[0] == 'config':
         config_key = isc.command
         configs[config_key] = {}

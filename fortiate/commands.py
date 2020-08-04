@@ -29,10 +29,13 @@ class IndentedShellCommand():
     generating formatted data using module shlex and preserve the indentation
     part of it.
     """
-    warning = (
+    _message_inconsistency = (
         'Warning: The raw command and its concatenation of '
         'indentation and split command are not consistent. Maybe '
-        'there are consecutive/trailing white spaces?'
+        '1. There are consecutive/trailing whitespaces.'
+        '2. There are quotes.'
+        '3. There are single quotes.'
+        '?'
     )
 
     def __init__(self, raw='', indented_with=' ', whitespace=' ', fail_silently=True):
@@ -40,7 +43,7 @@ class IndentedShellCommand():
         self._indented_with = indented_with
         self._whitespace = whitespace
         if not self.is_consistent() and not fail_silently:
-            print(self.warning)
+            print(self._message_inconsistency)
 
     def __str__(self):
         return self.raw

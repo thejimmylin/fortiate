@@ -1,5 +1,5 @@
+import re
 from shlex import shlex
-from shlex import quote
 
 
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
@@ -15,88 +15,128 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_
     return list(lex)
 
 
-def shlex_join(split_command, whitespace=' '):
+def shlex_join(split_command, whitespace=' ', using_single_quotes=True):
     """
     Re-define the join function in shlex to make it possible to specify custom
-    whitespace when we call it.
+    whitespace and quotes when we call it.
     """
-    return whitespace.join(quote(arg) for arg in split_command)
+    return whitespace.join(quote(arg, using_single_quotes=using_single_quotes) for arg in split_command)
 
 
-class IndentedShellCommand():
+_find_unsafe = re.compile(r'[^\w@%+=:,./-]', re.ASCII).search
+
+
+def quote(s, using_single_quotes=True):
     """
-    A class describing a single line shell-like command with indentation,
-    generating formatted data using module shlex and preserve the indentation
-    part of it.
+    Re-define the quote function in shlex to make it possible to specify custom
+    quote when we call it.
+    """
+    if not s:
+        return "''"
+    if _find_unsafe(s) is None:
+        return s
+
+    if using_single_quotes:
+        return "'" + s.replace("'", "'\"'\"'") + "'"
+    else:
+        return '"' + s.replace('"', '"\'"\'"') + '"'
+
+
+class ShellCommand():
+    """
+    A class describing a single line shell-like command.
     """
 
-    def __init__(self, raw='', indented_with=' ', whitespace=' ', check_consistency_silenty=False):
+    def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n', split_chars=' \t\r\n',
+                 join_char=' ', check_consistency_silently=False, using_single_quotes=True):
+
         self._raw = raw
-        self._indented_with = indented_with
-        self._whitespace = whitespace
-        if check_consistency_silenty and self.is_consistent():
+        self._lstrip_chars = lstrip_chars
+        self._rstrip_chars = rstrip_chars
+        self._split_chars = split_chars
+        self._join_char = join_char
+        self._using_single_quotes = using_single_quotes
+        if check_consistency_silently and not self.is_consistent():
             self._print_consitency_warning()
 
-    def __str__(self):
-        return self.raw
-
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self}>'
+        return f'<{self.__class__.__name__}: {self.raw.__repr__()}>'
 
     @property
     def raw(self):
         return self._raw
 
     @property
-    def indented_with(self):
-        return self._indented_with
+    def lstrip_chars(self):
+        return self._lstrip_chars
 
     @property
-    def whitespace(self):
-        return self._whitespace
+    def rstrip_chars(self):
+        return self._rstrip_chars
 
     @property
-    def indentation(self):
-        return self._raw[:-len(self._raw.lstrip(self._indented_with))]
+    def split_chars(self):
+        return self._split_chars
 
-    @indentation.setter
-    def indentation(self, value):
-        self._raw = value + self._raw.lstrip(self._indented_with)
+    @property
+    def join_char(self):
+        return self._join_char
+
+    @property
+    def using_single_quotes(self):
+        return self._using_single_quotes
+
+    @property
+    def leading(self):
+        return self._raw[:-len(self._raw.lstrip(self._lstrip_chars))]
+
+    @leading.setter
+    def leading(self, value):
+        self._raw = value + self._raw.lstrip(self._lstrip_chars)
+
+    @property
+    def trailing(self):
+        return self._raw[len(self._raw.rstrip(self._rstrip_chars)):]
+
+    @trailing.setter
+    def trailing(self, value):
+        self._raw = self._raw.rstrip(self._rstrip_chars) + value
 
     @property
     def command(self):
-        return self._raw.lstrip(self._indented_with)
+        return self._raw.lstrip(self._lstrip_chars).rstrip(self._rstrip_chars)
 
     @command.setter
     def command(self, value):
-        self._raw = (
-            self._raw[:-len(self._raw.lstrip(self._indented_with))] +
-            value
-        )
+        self._raw = self.leading + value + self.trailing
 
     @property
     def split_command(self):
         return shlex_split(
-            self.command, whitespace=self._whitespace
+            self.command, whitespace=self._split_chars
         )
 
     @split_command.setter
     def split_command(self, value):
-        self.command = shlex_join(value, whitespace=self._whitespace)
+        self.command = shlex_join(
+            value, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+        )
 
     def is_consistent(self):
         joined_command = shlex_join(
-            self.split_command, whitespace=self._whitespace
+            self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
         )
-        return self.indentation + joined_command == self._raw
+        return self.leading + joined_command + self.trailing == self._raw
 
     def _print_consitency_warning():
         consistency_warning = (
             'Warning: The raw command and its concatenation of '
-            'indentation and split command are not consistent. You may consider'
-            'the following possibility:\n\n'
+            'leading + split_command + trailing are not consistent. '
+            'You may consider the following common reason:\n\n'
             '1. There are consecutive/trailing whitespaces.\n'
-            '2. There are quotes around no-whitespace text.\n'
-            '3. There are double quotes.'
+            '2. There are inconsistent whitespaces between join_char '
+            'and the original one/ones.\n'
+            '3. There are quotes around no-whitespace text.\n'
+            '4. There are double quotes.'
         )
         print(consistency_warning)

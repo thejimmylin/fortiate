@@ -125,3 +125,22 @@ class ShellCommand():
             self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
         )
         return self.leading + joined_command + self.trailing == self._raw
+
+
+class FortiSetCommand(ShellCommand):
+
+    def is_valid(self):
+        if len(self.split_command) < 3:
+            return False
+        if self.split_command[:1] != ['set']:
+            return False
+        set_key = shlex_join(
+            self.split_command[:2], whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+        )
+        set_value = shlex_join(
+            self.split_command[2:], whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+        )
+        self.cleaned_data = {
+            set_key: set_value
+        }
+        return True

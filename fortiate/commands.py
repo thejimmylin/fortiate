@@ -48,16 +48,14 @@ class ShellCommand():
     """
 
     def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n', split_chars=' \t\r\n',
-                 join_char=' ', check_consistency_silently=False, using_single_quotes=True):
-
+                 join_char=' ', using_single_quotes=True, *args, **kwargs):
+        super().__init__()
         self._raw = raw
         self._lstrip_chars = lstrip_chars
         self._rstrip_chars = rstrip_chars
         self._split_chars = split_chars
         self._join_char = join_char
         self._using_single_quotes = using_single_quotes
-        if check_consistency_silently and not self.is_consistent():
-            self._print_consitency_warning()
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: {self.raw.__repr__()}>'
@@ -128,11 +126,33 @@ class ShellCommand():
         )
         return self.leading + joined_command + self.trailing == self._raw
 
+
+class IndentedShellCommand(ShellCommand):
+    """
+    A class describing a single line shell-like command with indentation.
+    """
+
+    def __init__(self, check_consistency_silently=False, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self._check_consistency_silently = check_consistency_silently
+        if not check_consistency_silently and not self.is_consistent():
+            self._print_consitency_warning()
+
+    @property
+    def check_consistency_silently(self):
+        return self._check_consistency_silently
+
+    def is_consistent(self):
+        joined_command = shlex_join(
+            self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+        )
+        return self.leading + joined_command + self.trailing == self._raw
+
     def _print_consitency_warning():
         consistency_warning = (
             'Warning: The raw command and its concatenation of '
             'leading + split_command + trailing are not consistent. '
-            'You may consider the following common reason:\n\n'
+            'The following common reason may be considered:\n\n'
             '1. There are consecutive/trailing whitespaces.\n'
             '2. There are inconsistent whitespaces between join_char '
             'and the original one/ones.\n'

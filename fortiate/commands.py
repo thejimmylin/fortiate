@@ -15,31 +15,31 @@ def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_
     return list(lex)
 
 
-def shlex_join(split_command, whitespace=' ', using_single_quotes=True):
+def shlex_join(split_command, whitespace=' ', quote_char="'"):
     """
     Re-define the join function in shlex to make it possible to specify custom
-    whitespace and quotes when we call it.
+    whitespace and quote_char when we call it.
     """
-    return whitespace.join(quote(arg, using_single_quotes=using_single_quotes) for arg in split_command)
+    return whitespace.join(quote(arg, quote_char=quote_char) for arg in split_command)
 
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]', re.ASCII).search
 
 
-def quote(s, using_single_quotes=True):
+def quote(s, quote_char="'"):
     """
     Re-define the quote function in shlex to make it possible to specify custom
-    quote when we call it.
+    quote_char when we call it.
     """
     if not s:
         return "''"
     if _find_unsafe(s) is None:
         return s
 
-    if using_single_quotes:
-        return "'" + s.replace("'", "'\"'\"'") + "'"
-    else:
-        return '"' + s.replace('"', '"\'"\'"') + '"'
+    the_other_quote_char = '"' if quote_char == "'" else "'"
+    q1 = quote_char
+    q2 = the_other_quote_char
+    return q1 + s.replace(q1, q1 + q2 + q1 + q2 + q1) + q1
 
 
 class ShellCommand():
@@ -48,13 +48,13 @@ class ShellCommand():
     """
 
     def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n',
-                 split_chars=' \t\r\n', join_char=' ', using_single_quotes=True):
+                 split_chars=' \t\r\n', join_char=' ', quote_char="'"):
         self._raw = raw
         self._lstrip_chars = lstrip_chars
         self._rstrip_chars = rstrip_chars
         self._split_chars = split_chars
         self._join_char = join_char
-        self._using_single_quotes = using_single_quotes
+        self._quote_char = quote_char
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: {self._raw.__repr__()}>'
@@ -80,8 +80,8 @@ class ShellCommand():
         return self._join_char
 
     @property
-    def using_single_quotes(self):
-        return self._using_single_quotes
+    def quote_char(self):
+        return self._quote_char
 
     @property
     def leading(self):
@@ -116,13 +116,13 @@ class ShellCommand():
     @split_command.setter
     def split_command(self, value):
         self.command = shlex_join(
-            value, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+            value, whitespace=self._join_char, quote_char=self._quote_char
         )
 
     @property
     def is_consistent(self):
         joined_command = shlex_join(
-            self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+            self.split_command, whitespace=self._join_char, quote_char=self._quote_char
         )
         return self.leading + joined_command + self.trailing == self._raw
 
@@ -135,11 +135,9 @@ class FortiSetCommand(ShellCommand):
         if self.split_command[:1] != ['set']:
             return False
         set_key = shlex_join(
-            self.split_command[:2], whitespace=self._join_char, using_single_quotes=self._using_single_quotes
+            self.split_command[:2], whitespace=self._join_char, quote_char=self._quote_char
         )
-        set_value = shlex_join(
-            self.split_command[2:], whitespace=self._join_char, using_single_quotes=self._using_single_quotes
-        )
+        set_value = self.split_command[2:]
         self.cleaned_data = {
             set_key: set_value
         }

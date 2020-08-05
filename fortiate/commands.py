@@ -30,20 +30,12 @@ class IndentedShellCommand():
     part of it.
     """
 
-    _warning_of_inconsistency = (
-        'Warning: The raw command and its concatenation of '
-        'indentation and split command are not consistent. You may consider'
-        'the following possibility:\n\n'
-        '1. There are consecutive/trailing whitespaces.\n'
-        '2. There are quotes around no-whitespace text.\n'
-        '3. There are double quotes.'
-    )
-
-    def __init__(self, raw='', indented_with=' ', whitespace=' ', fail_silently=True):
+    def __init__(self, raw='', indented_with=' ', whitespace=' ', check_consistency_silenty=False):
         self._raw = raw
         self._indented_with = indented_with
         self._whitespace = whitespace
-        self.is_consistent() and fail_silently or print(self._warning_of_inconsistency)
+        if check_consistency_silenty and self.is_consistent():
+            self._print_consitency_warning()
 
     def __str__(self):
         return self.raw
@@ -97,3 +89,14 @@ class IndentedShellCommand():
             self.split_command, whitespace=self._whitespace
         )
         return self.indentation + joined_command == self._raw
+
+    def _print_consitency_warning():
+        consistency_warning = (
+            'Warning: The raw command and its concatenation of '
+            'indentation and split command are not consistent. You may consider'
+            'the following possibility:\n\n'
+            '1. There are consecutive/trailing whitespaces.\n'
+            '2. There are quotes around no-whitespace text.\n'
+            '3. There are double quotes.'
+        )
+        print(consistency_warning)

@@ -47,9 +47,8 @@ class ShellCommand():
     A class describing a single line shell-like command.
     """
 
-    def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n', split_chars=' \t\r\n',
-                 join_char=' ', using_single_quotes=True, *args, **kwargs):
-        super().__init__()
+    def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n',
+                 split_chars=' \t\r\n', join_char=' ', using_single_quotes=True):
         self._raw = raw
         self._lstrip_chars = lstrip_chars
         self._rstrip_chars = rstrip_chars
@@ -58,7 +57,7 @@ class ShellCommand():
         self._using_single_quotes = using_single_quotes
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.raw.__repr__()}>'
+        return f'<{self.__class__.__name__}: {self._raw.__repr__()}>'
 
     @property
     def raw(self):
@@ -120,43 +119,9 @@ class ShellCommand():
             value, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
         )
 
-    def is_consistent(self):
-        joined_command = shlex_join(
-            self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
-        )
-        return self.leading + joined_command + self.trailing == self._raw
-
-
-class IndentedShellCommand(ShellCommand):
-    """
-    A class describing a single line shell-like command with indentation.
-    """
-
-    def __init__(self, check_consistency_silently=False, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
-        self._check_consistency_silently = check_consistency_silently
-        if not check_consistency_silently and not self.is_consistent():
-            self._print_consitency_warning()
-
     @property
-    def check_consistency_silently(self):
-        return self._check_consistency_silently
-
     def is_consistent(self):
         joined_command = shlex_join(
             self.split_command, whitespace=self._join_char, using_single_quotes=self._using_single_quotes
         )
         return self.leading + joined_command + self.trailing == self._raw
-
-    def _print_consitency_warning():
-        consistency_warning = (
-            'Warning: The raw command and its concatenation of '
-            'leading + split_command + trailing are not consistent. '
-            'The following common reason may be considered:\n\n'
-            '1. There are consecutive/trailing whitespaces.\n'
-            '2. There are inconsistent whitespaces between join_char '
-            'and the original one/ones.\n'
-            '3. There are quotes around no-whitespace text.\n'
-            '4. There are double quotes.'
-        )
-        print(consistency_warning)

@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 """
 In case fortiate is not installed as a package and is added to the $PYTHONPATH
 we add it to sys.path manually here. If fortiate has been added to your
@@ -8,13 +7,14 @@ $PYTHONPATH already, this could be skipped.
 """
 fortiate_path = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    'fortiate'
 )
 sys.path.insert(1, fortiate_path)
 """
 The above sys things could be skipped if you add fortiate to the $PYTHONPATH.
 """
-from commands import shlex_join, IndentedShellCommand  # NOQA
+import json
+from fortiate.commands import shlex_join, ShellCommand  # NOQA
+
 
 # Locate the conf file with relative path by module os.
 current_dir = os.path.dirname(__file__)
@@ -28,21 +28,21 @@ print('\n')
 print('------example1------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(line)
+    isc = ShellCommand(line)
     print(isc.raw)
 
 print('\n')
 print('------example2------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(line)
+    isc = ShellCommand(line)
     print(isc.command)
 
 print('\n')
 print('------example3------')
 print('\n')
 for line in lines:
-    isc = IndentedShellCommand(line)
+    isc = ShellCommand(line)
     print(isc.split_command)
 
 print('\n')
@@ -50,7 +50,7 @@ print('------example4------')
 print('\n')
 configs = {}
 for index, line in enumerate(lines):
-    isc = IndentedShellCommand(line)
+    isc = ShellCommand(line)
     if isc.split_command[0] == 'config':
         config_key = isc.command
         configs[config_key] = {}

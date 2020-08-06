@@ -1,5 +1,4 @@
-from .commands import IndentedShellCommand
-import commands
+from .commands import ShellCommand
 
 
 class IndentedShellConfig():
@@ -13,7 +12,7 @@ class IndentedShellConfig():
         set_key = ''
         context = {}
         for index, line in enumerate(lines):
-            command = IndentedShellCommand(raw=line)
+            command = ShellCommand(raw=line)
             if command.split_command[0] == 'set':
                 k, value = command.split_command[:2], command.split_command[2:]
                 set_key = ' '.join(k)
@@ -35,9 +34,10 @@ class IndentedShellConfig():
 
 # pseudocode
 
-
+'''
 class FortiAddressConfig(IndentedShellConfig):
 
     edit = commands.EditCommand(max_length=64, uniqe=True)
     subnet = commands.SetCommand(max_length=64)
     comments = commands.SetCommand(max_length=64, blank=True)
+'''

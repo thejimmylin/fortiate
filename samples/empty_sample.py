@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 """
 In case fortiate is not installed as a package and is added to the $PYTHONPATH
 we add it to sys.path manually here. If fortiate has been added to your

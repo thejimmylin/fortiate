@@ -2,6 +2,10 @@ import re
 from shlex import shlex
 
 
+__all__ = ['shlex_split', 'shlex_join', 'quote', 'ShellCommand',
+           'FortiConfigCommand', 'FortiEditCommand', 'FortiSetCommand']
+
+
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
     """
     Re-define the split function in shlex to make it possible to specify
@@ -127,6 +131,46 @@ class ShellCommand():
         return self.leading + joined_command + self.trailing == self._raw
 
 
+class FortiConfigCommand(ShellCommand):
+
+    def is_valid(self):
+        if len(self.split_command) != 2:
+            return False
+        if self.split_command[:1] != ['config']:
+            return False
+        self._generate_cleaned_data()
+        return True
+
+    def _generate_cleaned_data(self):
+        set_key = shlex_join(
+            self.split_command[:1], whitespace=self._join_char, quote_char=self._quote_char
+        )
+        set_value = self.split_command[1:]
+        self.cleaned_data = {
+            set_key: set_value
+        }
+
+
+class FortiEditCommand(ShellCommand):
+
+    def is_valid(self):
+        if len(self.split_command) != 2:
+            return False
+        if self.split_command[:1] != ['edit']:
+            return False
+        self._generate_cleaned_data()
+        return True
+
+    def _generate_cleaned_data(self):
+        set_key = shlex_join(
+            self.split_command[:1], whitespace=self._join_char, quote_char=self._quote_char
+        )
+        set_value = self.split_command[1:]
+        self.cleaned_data = {
+            set_key: set_value
+        }
+
+
 class FortiSetCommand(ShellCommand):
 
     def is_valid(self):
@@ -134,6 +178,10 @@ class FortiSetCommand(ShellCommand):
             return False
         if self.split_command[:1] != ['set']:
             return False
+        self._generate_cleaned_data()
+        return True
+
+    def _generate_cleaned_data(self):
         set_key = shlex_join(
             self.split_command[:2], whitespace=self._join_char, quote_char=self._quote_char
         )
@@ -141,4 +189,3 @@ class FortiSetCommand(ShellCommand):
         self.cleaned_data = {
             set_key: set_value
         }
-        return True

@@ -1,7 +1,10 @@
 from .commands import ShellCommand
 
 
-class IndentedShellConfig():
+__all__ = ['ShellConfig']
+
+
+class ShellConfig():
 
     def __init__(self, lines):
         self._init_with_lines(lines)

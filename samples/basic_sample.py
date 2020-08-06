@@ -1,4 +1,4 @@
-from empty_sample import shlex_join, ShellCommand
+from base import shlex_join, ShellCommand
 import os
 import json
 

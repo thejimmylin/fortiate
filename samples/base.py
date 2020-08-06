@@ -12,5 +12,5 @@ sys.path.insert(1, fortiate_path)
 """
 The above sys things could be skipped if you add fortiate to the $PYTHONPATH.
 """
-from fortiate.commands import shlex_join, ShellCommand  # NOQA
-from fortiate.configs import IndentedShellConfig  # NOQA
+from fortiate.commands import *  # NOQA
+from fortiate.configs import *  # NOQA

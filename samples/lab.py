@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from base import FortiSetCommand, FortiEditCommand, FortiConfigCommand
 
 
@@ -24,7 +25,7 @@ mappedip = FortiSetCommand()
 mappedip.midset = ['set', 'mappedip', '10.100.168.11']
 
 commands = [uuid, extip, extintf, mappedip]
-context = {}
+context = OrderedDict()
 for command in commands:
     if command.is_valid():
         context.update(command.cleaned_data)

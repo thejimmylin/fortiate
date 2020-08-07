@@ -61,7 +61,7 @@ class ShellCommand():
         self._quote_char = quote_char
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self._raw.__repr__()}>'
+        return f'{self.__class__.__name__}({self._raw.__repr__()})'
 
     @property
     def raw(self):

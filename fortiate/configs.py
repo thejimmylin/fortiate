@@ -16,20 +16,20 @@ class ShellConfig():
         context = {}
         for index, line in enumerate(lines):
             command = ShellCommand(raw=line)
-            if command.split_command[0] == 'set':
-                k, value = command.split_command[:2], command.split_command[2:]
+            if command.midset[0] == 'set':
+                k, value = command.midset[:2], command.midset[2:]
                 set_key = ' '.join(k)
                 context[config_key][edit_key][set_key] = ' '.join(value)
                 continue
-            if command.split_command[0] == 'edit':
-                edit_key = ' '.join(command.split_command)
+            if command.midset[0] == 'edit':
+                edit_key = ' '.join(command.midset)
                 context[config_key][edit_key] = {}
                 continue
-            if command.split_command[0] == 'config':
-                config_key = ' '.join(command.split_command)
+            if command.midset[0] == 'config':
+                config_key = ' '.join(command.midset)
                 context[config_key] = {}
                 continue
-            if command.split_command[0] in ('next', 'end'):
+            if command.midset[0] in ('next', 'end'):
                 continue
             raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
         self.context = context

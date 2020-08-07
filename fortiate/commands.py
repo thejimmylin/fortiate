@@ -104,48 +104,48 @@ class ShellCommand():
         self._raw = self._raw.rstrip(self._rstrip_chars) + value
 
     @property
-    def command(self):
+    def mid(self):
         return self._raw.lstrip(self._lstrip_chars).rstrip(self._rstrip_chars)
 
-    @command.setter
-    def command(self, value):
+    @mid.setter
+    def mid(self, value):
         self._raw = self.leading + value + self.trailing
 
     @property
-    def split_command(self):
+    def midset(self):
         return shlex_split(
-            self.command, whitespace=self._split_chars
+            self.mid, whitespace=self._split_chars
         )
 
-    @split_command.setter
-    def split_command(self, value):
-        self.command = shlex_join(
+    @midset.setter
+    def midset(self, value):
+        self.mid = shlex_join(
             value, whitespace=self._join_char, quote_char=self._quote_char
         )
 
     @property
     def is_consistent(self):
-        joined_command = shlex_join(
-            self.split_command, whitespace=self._join_char, quote_char=self._quote_char
+        joined_midset = shlex_join(
+            self.midset, whitespace=self._join_char, quote_char=self._quote_char
         )
-        return self.leading + joined_command + self.trailing == self._raw
+        return self.leading + joined_midset + self.trailing == self._raw
 
 
 class FortiConfigCommand(ShellCommand):
 
     def is_valid(self):
-        if len(self.split_command) != 2:
+        if len(self.midset) != 2:
             return False
-        if self.split_command[:1] != ['config']:
+        if self.midset[:1] != ['config']:
             return False
         self._generate_cleaned_data()
         return True
 
     def _generate_cleaned_data(self):
         set_key = shlex_join(
-            self.split_command[:1], whitespace=self._join_char, quote_char=self._quote_char
+            self.midset[:1], whitespace=self._join_char, quote_char=self._quote_char
         )
-        set_value = self.split_command[1:]
+        set_value = self.midset[1:]
         self.cleaned_data = {
             set_key: set_value
         }
@@ -154,18 +154,18 @@ class FortiConfigCommand(ShellCommand):
 class FortiEditCommand(ShellCommand):
 
     def is_valid(self):
-        if len(self.split_command) != 2:
+        if len(self.midset) != 2:
             return False
-        if self.split_command[:1] != ['edit']:
+        if self.midset[:1] != ['edit']:
             return False
         self._generate_cleaned_data()
         return True
 
     def _generate_cleaned_data(self):
         set_key = shlex_join(
-            self.split_command[:1], whitespace=self._join_char, quote_char=self._quote_char
+            self.midset[:1], whitespace=self._join_char, quote_char=self._quote_char
         )
-        set_value = self.split_command[1:]
+        set_value = self.midset[1:]
         self.cleaned_data = {
             set_key: set_value
         }
@@ -174,18 +174,18 @@ class FortiEditCommand(ShellCommand):
 class FortiSetCommand(ShellCommand):
 
     def is_valid(self):
-        if len(self.split_command) < 3:
+        if len(self.midset) < 3:
             return False
-        if self.split_command[:1] != ['set']:
+        if self.midset[:1] != ['set']:
             return False
         self._generate_cleaned_data()
         return True
 
     def _generate_cleaned_data(self):
         set_key = shlex_join(
-            self.split_command[:2], whitespace=self._join_char, quote_char=self._quote_char
+            self.midset[:2], whitespace=self._join_char, quote_char=self._quote_char
         )
-        set_value = self.split_command[2:]
+        set_value = self.midset[2:]
         self.cleaned_data = {
             set_key: set_value
         }

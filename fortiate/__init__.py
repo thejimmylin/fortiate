@@ -1,0 +1,1 @@
+print('The fortiate package has initialized.')

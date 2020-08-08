@@ -2,8 +2,7 @@ import re
 from shlex import shlex
 
 
-__all__ = ['shlex_split', 'shlex_join', 'quote', 'ShellCommand',
-           'FortiConfigCommand', 'FortiEditCommand', 'FortiSetCommand']
+__all__ = ['shlex_split', 'shlex_join', 'quote', 'ShellCommand']
 
 
 def shlex_split(s, comments=False, posix=True, whitespace=' \t\r\n', whitespace_split=True):
@@ -52,13 +51,20 @@ class ShellCommand():
     """
 
     def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n',
-                 split_chars=' \t\r\n', join_char=' ', quote_char="'"):
+                 split_chars=' \t\r\n', join_char=' ', quote_char="'",
+                 check_consistency=True):
         self._raw = raw
         self._lstrip_chars = lstrip_chars
         self._rstrip_chars = rstrip_chars
         self._split_chars = split_chars
         self._join_char = join_char
         self._quote_char = quote_char
+        if check_consistency and not self.is_consistent:
+            raise ValueError(
+                f'{self.__repr__()} is not consistent. '
+                'Spliting it and joining it back result in '
+                'different string.'
+            )
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self._raw.__repr__()})'
@@ -129,63 +135,3 @@ class ShellCommand():
             self.midset, whitespace=self._join_char, quote_char=self._quote_char
         )
         return self.leading + joined_midset + self.trailing == self._raw
-
-
-class FortiConfigCommand(ShellCommand):
-
-    def is_valid(self):
-        if len(self.midset) != 2:
-            return False
-        if self.midset[:1] != ['config']:
-            return False
-        self._generate_cleaned_data()
-        return True
-
-    def _generate_cleaned_data(self):
-        set_key = shlex_join(
-            self.midset[:1], whitespace=self._join_char, quote_char=self._quote_char
-        )
-        set_value = self.midset[1:]
-        self.cleaned_data = {
-            set_key: set_value
-        }
-
-
-class FortiEditCommand(ShellCommand):
-
-    def is_valid(self):
-        if len(self.midset) != 2:
-            return False
-        if self.midset[:1] != ['edit']:
-            return False
-        self._generate_cleaned_data()
-        return True
-
-    def _generate_cleaned_data(self):
-        set_key = shlex_join(
-            self.midset[:1], whitespace=self._join_char, quote_char=self._quote_char
-        )
-        set_value = self.midset[1:]
-        self.cleaned_data = {
-            set_key: set_value
-        }
-
-
-class FortiSetCommand(ShellCommand):
-
-    def is_valid(self):
-        if len(self.midset) < 3:
-            return False
-        if self.midset[:1] != ['set']:
-            return False
-        self._generate_cleaned_data()
-        return True
-
-    def _generate_cleaned_data(self):
-        set_key = shlex_join(
-            self.midset[:2], whitespace=self._join_char, quote_char=self._quote_char
-        )
-        set_value = self.midset[2:]
-        self.cleaned_data = {
-            set_key: set_value
-        }

@@ -42,6 +42,10 @@ def quote(s, quote_char="'"):
     the_other_quote_char = '"' if quote_char == "'" else "'"
     q1 = quote_char
     q2 = the_other_quote_char
+    # Use quote_char, and put quote_char shown in s into the_other_quote_char.
+    # For example, quote_char is single quote, and then the_other_quote_char is double quote.
+    # Now if s is McDonald's, it will be quoted as
+    # 'McDonald'"'"'s'
     return q1 + s.replace(q1, q1 + q2 + q1 + q2 + q1) + q1
 
 

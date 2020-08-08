@@ -1,31 +1,57 @@
-import sys
+from base import shlex_join, ShellCommand
 import os
 import json
-"""
-In case fortiate is not installed as a package, we add it to sys.path manually here.
-If you install fortiate and added it to the $PYTHONPATH, this could be skipped.
-"""
-fortiate_path = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    'fortiate'
-)
-sys.path.insert(1, fortiate_path)
-from parsers import Parser  # noqa
 
+# Locate the conf file with relative path by module os.
+current_dir = os.path.dirname(__file__)
+conf_file = os.path.join(current_dir, 'conf', 'firewall_policy.conf')
 
-base_dir = os.path.dirname(__file__)
-file_input = os.path.join(base_dir, 'conf', 'firewall policy.conf')
-file_output = os.path.join(base_dir, 'conf', 'firewall policy output.conf')
+with open(file=conf_file, mode='r', encoding='utf-8') as f:
+    lines = f.read().splitlines()
 
-p = Parser()
-with open(file=file_input, mode='r', encoding='utf-8') as f:
-    lines = f.readlines()
+print('\n')
+print('------example1------')
+print('\n')
+for line in lines:
+    isc = ShellCommand(line)
+    print(isc.raw)
 
-formatted_lines = p.get_formatted_lines(lines=lines)
-formatted_dct = p.get_formatted_dct(formatted_lines=formatted_lines)
+print('\n')
+print('------example2------')
+print('\n')
+for line in lines:
+    isc = ShellCommand(line)
+    print(isc.command)
 
-print(json.dumps(obj=formatted_dct, sort_keys=True, indent=4))
+print('\n')
+print('------example3------')
+print('\n')
+for line in lines:
+    isc = ShellCommand(line)
+    print(isc.split_command)
 
-reorganize_lines = p.get_reorganize_lines(formatted_lines=formatted_lines)
-with open(file=file_output, mode='w', encoding='utf-8') as file:
-    file.writelines('\n'.join(reorganize_lines))
+print('\n')
+print('------example4------')
+print('\n')
+configs = {}
+for index, line in enumerate(lines):
+    isc = ShellCommand(line)
+    if isc.split_command[0] == 'config':
+        config_key = isc.command
+        configs[config_key] = {}
+        continue
+    if isc.split_command[0] == 'edit':
+        edit_key = isc.command
+        configs[config_key][edit_key] = {}
+        continue
+    if isc.split_command[0] == 'set':
+        k, value = isc.split_command[:2], isc.split_command[2:]
+        set_key = shlex_join(k, whitespace=' ')
+        configs[config_key][edit_key][set_key] = shlex_join(value, whitespace=' ')
+        continue
+    if isc.split_command[0] in ('next', 'end'):
+        continue
+    raise ValueError(f'An invalid line exsits in config file, index = {index}, line = {line}.')
+
+# Pretty-print the configs dictionary.
+print(json.dumps(configs, indent=4))

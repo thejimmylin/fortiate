@@ -114,7 +114,7 @@ class ShellCommand():
     @phrases.setter
     def phrases(self, value):
         self._phrases = value
-        if self.check_consistency and not self.is_consistent():
+        if self._check_consistency and not self.is_consistent():
             raise ValueError(f'{self} is not consistent.')
 
     @property
@@ -127,6 +127,7 @@ class ShellCommand():
         self.phrases = new_phrases
 
     def is_consistent(self):
-        phrases1 = self._phrases
-        phrases2 = shlex_split(self.command, whitespace=self._split_chars)
-        return phrases1 == phrases2
+        phrases = self._phrases
+        command = shlex_join(self._phrases, whitespace=self._join_char, quote_char=self._quote_char)
+        split_command = shlex_split(command, whitespace=self._split_chars)
+        return phrases == split_command

@@ -66,7 +66,7 @@ class ShellCommand():
         if check_consistency and not self.is_consistent:
             raise ValueError(
                 f'{self.__repr__()} is not consistent. '
-                'Spliting it and joining it back result in '
+                'Spliting it and joining it back will result in '
                 'different string.'
             )
 

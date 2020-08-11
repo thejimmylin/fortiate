@@ -72,7 +72,13 @@ class ShellCommand():
 
     def __getitem__(self, obj):
         if isinstance(obj, slice):
-            return ShellCommand(self._phrases[obj])
+            return ShellCommand(
+                self._phrases[obj],
+                split_chars=self._split_chars,
+                join_char=self._join_char,
+                quote_char=self._quote_char,
+                check_consistency=self.check_consistency
+            )
         if isinstance(obj, int):
             return self._phrases[obj]
         raise TypeError

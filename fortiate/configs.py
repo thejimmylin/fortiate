@@ -7,13 +7,13 @@ __all__ = ['FortiConfig']
 
 class FortiConfig():
 
-    def __init__(self, lines):
+    def __init__(self, lines, quote_char="'"):
         config_key = ''
         edit_key = ''
         set_key = ''
         data = OrderedDict()
         for line in lines:
-            sc = ShellCommand(line, quote_char='"')
+            sc = ShellCommand(line)
             if sc.phrases[0] == 'config':
                 config_key = sc.command
                 data[config_key] = {}

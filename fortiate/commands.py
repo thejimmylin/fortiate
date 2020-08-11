@@ -54,12 +54,15 @@ class ShellCommand():
     A class describing a single line shell-like command.
     """
 
-    def __init__(self, phrases=[], split_chars=' \t\r\n', join_char=' ', quote_char="'", check_consistency=True):
+    def __init__(self, data=[], split_chars=' \t\r\n', join_char=' ', quote_char="'", check_consistency=True):
         self._split_chars = split_chars
         self._join_char = join_char
         self._quote_char = quote_char
         self._check_consistency = check_consistency
-        self.phrases = phrases
+        if isinstance(data, list):
+            self.phrases = data
+        elif isinstance(data, str):
+            self.phrases = shlex_split(data, whitespace=self.split_chars)
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self._phrases.__repr__()})'
@@ -72,12 +75,12 @@ class ShellCommand():
             return ShellCommand(self._phrases[obj])
         if isinstance(obj, int):
             return self._phrases[obj]
-        raise ValueError
+        raise TypeError
 
     def __add__(self, obj):
         if isinstance(obj, ShellCommand):
             return ShellCommand(self._phrases + obj._phrases)
-        raise ValueError
+        raise TypeError
 
     def __eq__(self, obj):
         if not isinstance(obj, ShellCommand):

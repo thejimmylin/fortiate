@@ -11,25 +11,25 @@ class FortiConfig():
         config_key = ''
         edit_key = ''
         set_key = ''
-        context = OrderedDict()
+        config = OrderedDict()
         for line in lines:
             sc = ShellCommand(line, quote_char='"')
-            if sc.midset[0] == 'set':
-                k, value = sc.midset[:2], sc.midset[2:]
-                set_key = ' '.join(k)
-                context[config_key][edit_key][set_key] = ' '.join(value)
+            if sc.phrases[0] == 'config':
+                config_key = sc.command
+                config[config_key] = {}
                 continue
-            if sc.midset[0] == 'edit':
-                edit_key = ' '.join(sc.midset)
-                context[config_key][edit_key] = {}
+            if sc.phrases[0] == 'edit':
+                edit_key = sc.command
+                config[config_key][edit_key] = {}
                 continue
-            if sc.midset[0] == 'config':
-                config_key = ' '.join(sc.midset)
-                context[config_key] = {}
+            if sc[0] == 'set':
+                set_key = sc[:2].command
+                value = sc[2:]
+                config[config_key][edit_key][set_key] = value
                 continue
-            if sc.midset[0] in ('next', 'end'):
+            if sc.phrases[0] in ('next', 'end'):
                 continue
             raise ValueError(
                 f'"{line}" is a valid line.'
             )
-        self.context = context
+        self.config = config

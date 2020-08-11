@@ -94,9 +94,6 @@ class ShellCommand():
         )
         return is_equal
 
-    def __jsonencode__(self):
-        return {'username': self.username}
-
     @property
     def split_chars(self):
         return self._split_chars

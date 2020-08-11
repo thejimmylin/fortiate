@@ -1,3 +1,4 @@
+import json
 from collections import OrderedDict
 from .commands import ShellCommand
 
@@ -33,3 +34,6 @@ class FortiConfig():
                 f'"{line}" is a valid line.'
             )
         self.config = config
+
+    def as_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4)

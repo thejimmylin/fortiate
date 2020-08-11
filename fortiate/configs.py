@@ -35,5 +35,12 @@ class FortiConfig():
             )
         self.config = config
 
-    def as_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+    def __str__(self):
+        lines = []
+        for config_key, config_value in self.config.items():
+            lines += [config_key]
+            for edit_key, edit_value in config_value.items():
+                lines += ['    ' + edit_key]
+                for set_key, set_value in edit_value.items():
+                    lines += ['        ' + set_key + ' ' + set_value.command]
+        return '\n'.join(lines)

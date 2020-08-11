@@ -10,5 +10,4 @@ with open(file=conf_file, mode='r', encoding='utf-8') as f:
     lines = f.read().splitlines()
 
 fc = FortiConfig(lines)
-
-print(fc.config)
+print(fc)

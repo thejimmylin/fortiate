@@ -61,8 +61,12 @@ class ShellCommand():
         self._check_consistency = check_consistency
         if isinstance(data, list):
             self.phrases = data
+        elif isinstance(data, tuple):
+            self.phrases = list(data)
         elif isinstance(data, str):
             self.phrases = shlex_split(data, whitespace=self.split_chars)
+        else:
+            raise TypeError('Data must be a string or a list.')
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self._phrases.__repr__()})'

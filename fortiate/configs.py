@@ -11,9 +11,10 @@ class FortiConfig():
         config_key = ''
         edit_key = ''
         set_key = ''
+        self._quote_char = quote_char
         data = OrderedDict()
         for line in lines:
-            sc = ShellCommand(line)
+            sc = ShellCommand(line, quote_char=self._quote_char)
             if sc.phrases[0] == 'config':
                 config_key = sc.command
                 data[config_key] = {}
@@ -45,3 +46,7 @@ class FortiConfig():
             lines += ['    next']
         lines += ['end']
         return '\n'.join(lines)
+
+    @property
+    def quote_char(self):
+        return self._quote_char

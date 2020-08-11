@@ -7,7 +7,7 @@ __all__ = ['FortiConfig']
 
 class FortiConfig():
 
-    def __init__(self, lines, quote_char="'"):
+    def __init__(self, lines=[], quote_char="'"):
         config_key = ''
         edit_key = ''
         set_key = ''

@@ -54,36 +54,55 @@ class ShellCommand():
     A class describing a single line shell-like command.
     """
 
-    def __init__(self, raw='', lstrip_chars=' \t\r\n', rstrip_chars=' \t\r\n',
-                 split_chars=' \t\r\n', join_char=' ', quote_char="'",
-                 check_consistency=True):
-        self._raw = raw
-        self._lstrip_chars = lstrip_chars
-        self._rstrip_chars = rstrip_chars
+    def __init__(self, data=[], split_chars=' \t\r\n', join_char=' ', quote_char="'", check_consistency=True):
         self._split_chars = split_chars
         self._join_char = join_char
         self._quote_char = quote_char
-        if check_consistency and not self.is_consistent:
-            raise ValueError(
-                f'{self.__repr__()} is not consistent. '
-                'Spliting it and joining it back will result in '
-                'different string.'
-            )
+        self._check_consistency = check_consistency
+        if isinstance(data, list):
+            self.phrases = data
+        elif isinstance(data, tuple):
+            self.phrases = list(data)
+        elif isinstance(data, str):
+            self.phrases = shlex_split(data, whitespace=self.split_chars)
+        else:
+            raise TypeError('Data must be a string or a list.')
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self._raw.__repr__()})'
+        return f'{self.__class__.__name__}({self._phrases.__repr__()})'
 
-    @property
-    def raw(self):
-        return self._raw
+    def __len__(self):
+        return len(self._phrases)
 
-    @property
-    def lstrip_chars(self):
-        return self._lstrip_chars
+    def __getitem__(self, obj):
+        if isinstance(obj, slice):
+            return ShellCommand(
+                self._phrases[obj],
+                split_chars=self._split_chars,
+                join_char=self._join_char,
+                quote_char=self._quote_char,
+                check_consistency=self.check_consistency
+            )
+        if isinstance(obj, int):
+            return self._phrases[obj]
+        raise TypeError
 
-    @property
-    def rstrip_chars(self):
-        return self._rstrip_chars
+    def __add__(self, obj):
+        if isinstance(obj, ShellCommand):
+            return ShellCommand(self._phrases + obj._phrases)
+        raise TypeError
+
+    def __eq__(self, obj):
+        if not isinstance(obj, ShellCommand):
+            return False
+        is_equal = (
+            self._split_chars == obj._split_chars and
+            self._join_char == obj._join_char and
+            self._quote_char == obj._quote_char and
+            self._check_consistency == obj._check_consistency and
+            self._phrases == obj._phrases
+        )
+        return is_equal
 
     @property
     def split_chars(self):
@@ -98,44 +117,30 @@ class ShellCommand():
         return self._quote_char
 
     @property
-    def leading(self):
-        return self._raw[:-len(self._raw.lstrip(self._lstrip_chars))]
-
-    @leading.setter
-    def leading(self, value):
-        self._raw = value + self._raw.lstrip(self._lstrip_chars)
+    def check_consistency(self):
+        return self._check_consistency
 
     @property
-    def trailing(self):
-        return self._raw[len(self._raw.rstrip(self._rstrip_chars)):]
+    def phrases(self):
+        return self._phrases
 
-    @trailing.setter
-    def trailing(self, value):
-        self._raw = self._raw.rstrip(self._rstrip_chars) + value
-
-    @property
-    def mid(self):
-        return self._raw.lstrip(self._lstrip_chars).rstrip(self._rstrip_chars)
-
-    @mid.setter
-    def mid(self, value):
-        self._raw = self.leading + value + self.trailing
+    @phrases.setter
+    def phrases(self, value):
+        self._phrases = value
+        if self._check_consistency and not self.is_consistent():
+            raise ValueError(f'{self} is not consistent.')
 
     @property
-    def midset(self):
-        return shlex_split(
-            self.mid, whitespace=self._split_chars
-        )
+    def command(self):
+        return shlex_join(self._phrases, whitespace=self._join_char, quote_char=self._quote_char)
 
-    @midset.setter
-    def midset(self, value):
-        self.mid = shlex_join(
-            value, whitespace=self._join_char, quote_char=self._quote_char
-        )
+    @command.setter
+    def command(self, value):
+        new_phrases = shlex_split(value, whitespace=self._split_chars)
+        self.phrases = new_phrases
 
-    @property
     def is_consistent(self):
-        joined_midset = shlex_join(
-            self.midset, whitespace=self._join_char, quote_char=self._quote_char
-        )
-        return self.leading + joined_midset + self.trailing == self._raw
+        phrases = self._phrases
+        command = shlex_join(self._phrases, whitespace=self._join_char, quote_char=self._quote_char)
+        split_command = shlex_split(command, whitespace=self._split_chars)
+        return phrases == split_command

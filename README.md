@@ -144,19 +144,8 @@ Now we have a new output of **print(fc)**
 >>> print(fc)
 config firewall policy
     edit 168
-        set name 'policy 168'
-        set uuid 14435052-3097-4d70-98c7-1dd2d60e229f
-        set srcintf jimmylin__1688
-        set dstintf port1
-        set srcaddr address__jimmylin__10.100.168.11/32
-        set dstaddr all
-        set action accept
-        set schedule always
-        set service ALL
-        set comments '{"customer": "Jimmy Lin", "remark": "this comment contains json"}'
-        set nat enable
-        set ippool enable
-        set poolname ippool__jimmylin__168.100.168.11
+...
+...
     edit 169
         set name 'policy 169'
         set uuid 2d05b2f4-9968-43c0-8bfa-581e04144466
@@ -166,20 +155,11 @@ config firewall policy
         set dstaddr vip__jimmylin__168.100.168.11
         set action accept
         set schedule always
-        set service HTTP HTTPS RDP **FTP**
+        set service HTTP HTTPS RDP FTP
         set comments '{"customer": "Jimmy Lin", "remark": "this comment contains json"}'
     edit 170
-        set name 'policy 170'
-        set uuid 2d05b2f4-9968-43c0-8bfa-581e04144466
-        set srcintf port1
-        set dstintf jimmylin__1688
-        set srcaddr all
-        set dstaddr vip__jimmylin__168.100.168.11
-        set action accept
-        set schedule always
-        set service service__tcp__8080__8080
-        set comments '{"customer": "Jimmy Lin", "remark": "this comment contains json"}'
-    next
+...
+...
 end
 ```
 See smaples.py for more detail.

@@ -1,9 +1,7 @@
 # fortiate
 For reading and writing config of Forti easily.
 
-> Based on Python standard library <a href="https://docs.python.org/3/library/shlex.html">shlex</a>
-
-> Python version: **3.8** or later
+> Based on Python standard library <a href="https://docs.python.org/3/library/shlex.html">shlex</a> with Python version **3.8** or later
 
 ## What does fortiate do?
  What it mainly do is it turns config like this

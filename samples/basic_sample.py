@@ -1,3 +1,4 @@
+from base import ShellCommand  # NOQA
 from base import FortiConfig
 import os
 
@@ -10,7 +11,7 @@ with open(file=conf_file, mode='r', encoding='utf-8') as f:
     lines = f.read().splitlines()
 
 fc = FortiConfig(lines)
-print(fc)
+print('printing fc..\n\n', fc)
 
 # This also works
 # fc = FortiConfig(lines, quote_char='"')

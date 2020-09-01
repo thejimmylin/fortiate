@@ -1,5 +1,5 @@
 # fortiate
-For reading and writing config of Forti easily.
+A module for reading and writing config of Forti easily.
 
 > Based on Python standard library <a href="https://docs.python.org/3/library/shlex.html">shlex</a> with Python version **3.8** or later
 

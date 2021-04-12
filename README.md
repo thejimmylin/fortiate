@@ -5,7 +5,7 @@ A module for reading and writing config of Forti easily.
 
 ## What does fortiate do?
  What it mainly do is it turns config like this
- ```
+ ```txt
 config firewall policy
     edit 168
         set name "policy168"
@@ -25,7 +25,7 @@ config firewall policy
 end
 ```
 to this
-```
+```python
 {
     "config firewall policy": {
         "edit 168": {
@@ -117,7 +117,7 @@ end
 
 You can read/edit these data with **fc** easily
 
-```
+```python
 >>> fc
 <fortiate.configs.FortiConfig object at 0x00000251E5909D30>
 >>> fc.data['config firewall policy']['edit 169']['set service']
@@ -126,7 +126,7 @@ ShellCommand(['HTTP', 'HTTPS', 'RDP'])
 
 **ShellCommand** is like a list of phrases, you can read/edit it easily too.
 
-```
+```python
 >>> fc.data['config firewall policy']['edit 169']['set service'][0]
 'HTTP'
 >>> fc.data['config firewall policy']['edit 169']['set service'][1:]
@@ -140,7 +140,7 @@ ShellCommand(['HTTP', 'HTTPS', 'RDP', 'FTP'])
 ```
 
 Now we have a new output of **print(fc)**
-```
+```python
 >>> print(fc)
 >>> fc.data['config firewall policy']['edit 169']['set service'] += ShellCommand('FTP')
 >>> print(fc)
